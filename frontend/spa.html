@@ -1,0 +1,740 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Task Manager - Dashboard</title>
+  <style>
+    :root {
+      --primary: #0f172a;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --hover: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .navbar {
+      background: var(--card-bg);
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 0 32px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .navbar h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-info {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-light);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 32px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 32px;
+      margin-bottom: 32px;
+      border: 1px solid var(--border);
+    }
+
+    .card-header {
+      margin-bottom: 24px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .metric-card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .metric-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-light);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    th {
+      background: var(--hover);
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-light);
+      border-bottom: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+    }
+
+    th:first-child {
+      border-top-left-radius: 8px;
+      border-left: 1px solid var(--border);
+    }
+
+    th:last-child {
+      border-top-right-radius: 8px;
+      border-right: 1px solid var(--border);
+    }
+
+    td {
+      padding: 16px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    td:first-child {
+      border-left: 1px solid var(--border);
+    }
+
+    td:last-child {
+      border-right: 1px solid var(--border);
+    }
+
+    tr:last-child td:first-child {
+      border-bottom-left-radius: 8px;
+    }
+
+    tr:last-child td:last-child {
+      border-bottom-right-radius: 8px;
+    }
+
+    tr:hover td {
+      background: #f8fafc;
+    }
+
+    .inline-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto;
+      gap: 16px;
+      align-items: end;
+      background: var(--hover);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-light);
+    }
+
+    input,
+    select {
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+      box-sizing: border-box;
+      width: 100%;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      height: 42px;
+    }
+
+    button:hover {
+      background: #1e293b;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .badge-select {
+      appearance: none;
+      padding: 6px 32px 6px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .badge-select:disabled {
+      cursor: not-allowed;
+      opacity: 0.9;
+      background-image: none;
+      padding-right: 12px;
+    }
+
+    .badge-select:focus {
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+      border-color: transparent;
+    }
+
+    .status-pending {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-in_progress {
+      background-color: #e0e7ff;
+      color: #3730a3;
+    }
+
+    .status-completed {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .login-container {
+      max-width: 420px;
+      margin: 80px auto;
+    }
+
+    .login-container .card {
+      padding: 40px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .login-container h2 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 32px;
+      font-size: 24px;
+      color: var(--primary);
+    }
+
+    .login-container .form-group {
+      margin-bottom: 20px;
+    }
+
+    .login-container button {
+      width: 100%;
+      margin-top: 12px;
+      height: 44px;
+      font-size: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="navbar">
+    <h1>Team Task Manager</h1>
+    <div class="nav-right" id="authArea"></div>
+  </div>
+
+  <div class="container" id="main"></div>
+
+  <script>
+    const api = window.location.origin;
+
+    function parseJwt(token) {
+      try {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) { return null; }
+    }
+
+    function el(tag, attrs = {}, ...children) {
+      const e = document.createElement(tag);
+      Object.entries(attrs || {}).forEach(([k, v]) => {
+        if (k === 'onclick' || k === 'onsubmit' || k === 'onchange') e.addEventListener(k.substring(2), v);
+        else if (v !== false) e.setAttribute(k, v);
+      });
+      children.flat().forEach(c => {
+        if (typeof c === 'string' || typeof c === 'number') e.appendChild(document.createTextNode(String(c)));
+        else if (c) e.appendChild(c)
+      });
+      return e;
+    }
+
+    function setAuthArea() {
+      const auth = document.getElementById('authArea');
+      auth.innerHTML = '';
+      const token = localStorage.getItem('ttm_token');
+      if (token) {
+        const user = parseJwt(token);
+        const span = el('div', { class: 'user-info' }, `Welcome, ${user.name || user.sub} (${user.role})`);
+        const btn = el('button', { onclick: logout, style: 'height:36px; padding:0 16px; font-size: 13px;' }, 'Sign Out');
+        auth.appendChild(span);
+        auth.appendChild(btn);
+      } else {
+        const btn = el('button', { onclick: showLogin }, 'Login');
+        auth.appendChild(btn);
+      }
+    }
+
+    function showLogin() {
+      const main = document.getElementById('main');
+      main.innerHTML = '';
+
+      const wrap = el('div', { class: 'login-container' });
+      const card = el('div', { class: 'card' });
+      const form = el('form');
+
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+        const email = form.email.value; const password = form.password.value;
+        try {
+          const res = await fetch(api + '/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+          if (!res.ok) { alert('Login failed. Check credentials.'); return; }
+          const data = await res.json();
+          localStorage.setItem('ttm_token', data.access_token);
+          setAuthArea();
+          renderDashboard();
+        } catch (err) { alert('Network error') }
+      };
+      form.appendChild(el('h2', {}, 'Welcome Back'));
+
+      const g1 = el('div', { class: 'form-group' });
+      g1.appendChild(el('label', {}, 'Email Address'));
+      g1.appendChild(el('input', { name: 'email', required: true }));
+      form.appendChild(g1);
+
+      const g2 = el('div', { class: 'form-group' });
+      g2.appendChild(el('label', {}, 'Password'));
+      g2.appendChild(el('input', { name: 'password', type: 'password', required: true }));
+      form.appendChild(g2);
+
+      form.appendChild(el('button', { type: 'submit' }, 'Sign In'));
+
+      const toggle = el('div', { style: 'text-align:center; margin-top:16px; font-size:14px;' });
+      toggle.appendChild(document.createTextNode("Don't have an account? "));
+      const a = el('a', { href: '#', onclick: (e) => { e.preventDefault(); showSignup(); }, style: 'color:var(--primary); font-weight:600; text-decoration:none;' }, 'Sign up');
+      toggle.appendChild(a);
+      form.appendChild(toggle);
+
+      const demoBox = el('div', { style: 'margin-top:24px; padding:16px; background:#f8fafc; border-radius:8px; font-size:13px; color:var(--text-light); border:1px dashed #cbd5e1;' });
+      demoBox.appendChild(el('div', { style: 'font-weight:600; margin-bottom:8px; color:var(--text);' }, 'Recruiter Demo Credentials:'));
+      demoBox.appendChild(el('div', { style: 'margin-bottom:4px;'}, 'Admin: alice.admin@example.com / alicepass'));
+      demoBox.appendChild(el('div', { style: 'margin-bottom:4px;'}, 'Member: bob.builder@example.com / bobpass'));
+      demoBox.appendChild(el('div', {}, 'Member: carol.cooper@example.com / carolpass'));
+      form.appendChild(demoBox);
+
+      card.appendChild(form);
+      wrap.appendChild(card);
+      main.appendChild(wrap);
+    }
+
+    function showSignup() {
+      const main = document.getElementById('main');
+      main.innerHTML = '';
+
+      const wrap = el('div', { class: 'login-container' });
+      const card = el('div', { class: 'card' });
+      const form = el('form');
+
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+        const body = {
+          name: form.name.value,
+          email: form.email.value,
+          password: form.password.value,
+          role: form.role.value
+        };
+        try {
+          const res = await fetch(api + '/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+          if (!res.ok) { alert('Signup failed. Email might be in use.'); return; }
+          alert('Account created successfully! Please sign in.');
+          showLogin();
+        } catch (err) { alert('Network error') }
+      };
+
+      form.appendChild(el('h2', {}, 'Create Account'));
+
+      const g1 = el('div', { class: 'form-group' });
+      g1.appendChild(el('label', {}, 'Full Name'));
+      g1.appendChild(el('input', { name: 'name', required: true }));
+      form.appendChild(g1);
+
+      const g2 = el('div', { class: 'form-group' });
+      g2.appendChild(el('label', {}, 'Email Address'));
+      g2.appendChild(el('input', { name: 'email', type: 'email', required: true }));
+      form.appendChild(g2);
+
+      const g3 = el('div', { class: 'form-group' });
+      g3.appendChild(el('label', {}, 'Password'));
+      g3.appendChild(el('input', { name: 'password', type: 'password', required: true }));
+      form.appendChild(g3);
+
+      const g4 = el('div', { class: 'form-group' });
+      g4.appendChild(el('label', {}, 'Role'));
+      const rSelect = el('select', { name: 'role', required: true });
+      rSelect.appendChild(el('option', { value: 'member' }, 'Member'));
+      rSelect.appendChild(el('option', { value: 'admin' }, 'Admin'));
+      g4.appendChild(rSelect);
+      form.appendChild(g4);
+
+      form.appendChild(el('button', { type: 'submit' }, 'Sign Up'));
+
+      const toggle = el('div', { style: 'text-align:center; margin-top:16px; font-size:14px;' });
+      toggle.appendChild(document.createTextNode('Already have an account? '));
+      const a = el('a', { href: '#', onclick: (e) => { e.preventDefault(); showLogin(); }, style: 'color:var(--primary); font-weight:600; text-decoration:none;' }, 'Sign in');
+      toggle.appendChild(a);
+      form.appendChild(toggle);
+
+      card.appendChild(form);
+      wrap.appendChild(card);
+      main.appendChild(wrap);
+    }
+
+    async function logout() { localStorage.removeItem('ttm_token'); setAuthArea(); renderDashboard(); }
+
+    async function renderDashboard() {
+      const main = document.getElementById('main'); main.innerHTML = '';
+      const token = localStorage.getItem('ttm_token');
+      const user = token ? parseJwt(token) : null;
+      const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+
+      // Dashboard Metrics
+      const dashCard = el('div'); // No .card class so metrics float freely
+      dashCard.style.marginBottom = '32px';
+      try {
+        const res = await fetch(api + '/dashboard', { headers });
+        if (res.ok) {
+          const stats = await res.json();
+          const grid = el('div', { class: 'metric-grid' });
+          grid.appendChild(el('div', { class: 'metric-card' }, el('div', { class: 'metric-title' }, 'Total Tasks'), el('div', { class: 'metric-value' }, stats.total_tasks)));
+          grid.appendChild(el('div', { class: 'metric-card' }, el('div', { class: 'metric-title' }, 'Completed'), el('div', { class: 'metric-value', style: 'color:#16a34a' }, stats.completed)));
+          grid.appendChild(el('div', { class: 'metric-card' }, el('div', { class: 'metric-title' }, 'Pending'), el('div', { class: 'metric-value', style: 'color:#ca8a04' }, stats.pending)));
+          grid.appendChild(el('div', { class: 'metric-card' }, el('div', { class: 'metric-title' }, 'Overdue'), el('div', { class: 'metric-value', style: 'color:#dc2626' }, stats.overdue)));
+          dashCard.appendChild(grid);
+        } else {
+          showLogin(); return; // Force login view if unauthorized
+        }
+      } catch (e) { dashCard.appendChild(el('div', {}, 'Error fetching dashboard')); }
+      main.appendChild(dashCard);
+
+      if (!user) return;
+
+      // Fetch all data first with cache-busting
+      let projects = [];
+      let tasks = [];
+      let projectOptions = [];
+      let userOptions = [];
+
+      try {
+        const [pRes, tRes] = await Promise.all([
+          fetch(api + '/projects', { headers, cache: 'no-store' }),
+          fetch(api + '/tasks', { headers, cache: 'no-store' })
+        ]);
+        if (pRes.ok) {
+          projects = await pRes.json();
+          projectOptions = [...projects]; // copy for dropdown
+        }
+        if (tRes.ok) tasks = await tRes.json();
+        
+        if (user.role === 'admin') {
+           const uRes = await fetch(api + '/users', {headers, cache: 'no-store'});
+           if(uRes.ok) userOptions = await uRes.json();
+        }
+      } catch(e) {}
+
+      // Admin Controls Section (Forms)
+      if (user.role === 'admin') {
+        const adminCard = el('div', { class: 'card' });
+        const aHead = el('div', { class: 'card-header' });
+        aHead.appendChild(el('h2', {}, 'Admin Controls: Create Data'));
+        adminCard.appendChild(aHead);
+
+        // Project Form
+        const pform = el('form', {
+          class: 'inline-form', onsubmit: async (e) => {
+            e.preventDefault();
+            const res = await fetch(api + '/projects', {
+              method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+              body: JSON.stringify({ title: pform.title.value, description: pform.description.value })
+            });
+            if (res.ok) { renderDashboard(); } else { alert('Failed to create project'); }
+          }
+        });
+        const gp1 = el('div', { class: 'form-group' });
+        gp1.appendChild(el('label', {}, 'Project Title'));
+        gp1.appendChild(el('input', { name: 'title', required: true }));
+        pform.appendChild(gp1);
+
+        const gp2 = el('div', { class: 'form-group' });
+        gp2.appendChild(el('label', {}, 'Description'));
+        gp2.appendChild(el('input', { name: 'description', required: true }));
+        pform.appendChild(gp2);
+
+        pform.appendChild(el('button', { type: 'submit' }, '+ Add Project'));
+        adminCard.appendChild(pform);
+
+        // Task Form
+        const tform = el('form', {
+          class: 'inline-form', onsubmit: async (e) => {
+            e.preventDefault();
+            const body = {
+              title: tform.title.value,
+              description: tform.description.value,
+              project_id: parseInt(tform.project_id.value),
+              assigned_to: parseInt(tform.assigned_to.value)
+            };
+            const res = await fetch(api + '/tasks', {
+              method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+              body: JSON.stringify(body)
+            });
+            if (res.ok) { renderDashboard(); } else { alert('Failed to create task'); }
+          }
+        });
+
+        const gt1 = el('div', { class: 'form-group', style: 'grid-column: span 2' });
+        gt1.appendChild(el('label', {}, 'Task Title'));
+        gt1.appendChild(el('input', { name: 'title', required: true }));
+        tform.appendChild(gt1);
+
+        const gt2 = el('div', { class: 'form-group', style: 'grid-column: span 2' });
+        gt2.appendChild(el('label', {}, 'Description'));
+        gt2.appendChild(el('input', { name: 'description', required: true }));
+        tform.appendChild(gt2);
+
+        const gt3 = el('div', { class: 'form-group' });
+        gt3.appendChild(el('label', {}, 'Project'));
+        const pSelect = el('select', { name: 'project_id', required: true });
+        pSelect.appendChild(el('option', { value: '', disabled: true, selected: true }, 'Select Project'));
+        projectOptions.forEach(p => pSelect.appendChild(el('option', { value: p.id }, p.title)));
+        gt3.appendChild(pSelect);
+        tform.appendChild(gt3);
+
+        const gt4 = el('div', { class: 'form-group' });
+        gt4.appendChild(el('label', {}, 'Assign To'));
+        const uSelect = el('select', { name: 'assigned_to', required: true });
+        uSelect.appendChild(el('option', { value: '', disabled: true, selected: true }, 'Select User'));
+        userOptions.forEach(u => uSelect.appendChild(el('option', { value: u.id }, `${u.name} (${u.role})`)));
+        gt4.appendChild(uSelect);
+        tform.appendChild(gt4);
+
+        tform.appendChild(el('button', { type: 'submit' }, '+ New Task'));
+        adminCard.appendChild(tform);
+
+        main.appendChild(adminCard);
+      }
+
+      // Group Tasks by Project
+      projects.forEach(p => {
+        const pCard = el('div', { class: 'card' });
+        const pHead = el('div', { class: 'card-header' });
+        pHead.appendChild(el('h2', {}, `${p.title} `));
+        pHead.appendChild(el('span', {style: 'font-size:12px; color:var(--text-light); background:var(--hover); padding:4px 8px; border-radius:4px; margin-left:8px; font-weight:normal;'}, `ID: ${p.id}`));
+        pHead.appendChild(el('div', {style: 'font-size:14px; color:var(--text-light); margin-top:4px;'}, p.description));
+        pCard.appendChild(pHead);
+
+        const pTasks = tasks.filter(t => t.project_id === p.id);
+        
+        if (pTasks.length > 0) {
+          const table = el('table');
+          table.appendChild(el('thead', {}, el('tr', {}, el('th', {}, '#'), el('th', {}, 'Task'), el('th', {}, 'Assigned To'), el('th', {}, 'Status'))));
+          const tbody = el('tbody');
+          
+          pTasks.forEach(t => {
+            const assigneeText = t.assignee_name ? `${t.assignee_name}` : `User #${t.assigned_to}`;
+            const tr = el('tr', {},
+              el('td', { style: 'color:var(--text-light)' }, t.id),
+              el('td', { style: 'font-weight:500' }, t.title),
+              el('td', {}, assigneeText)
+            );
+
+            // Status Badge Dropdown
+            const select = el('select', {
+              class: `badge-select status-${t.status}`,
+              onchange: async (e) => {
+                const newStatus = e.target.value;
+                const pres = await fetch(api + '/tasks/' + t.id + '/status', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                  body: JSON.stringify({ status: newStatus })
+                });
+                if (!pres.ok) { alert('Failed to update status'); e.target.value = t.status; }
+                else { select.className = `badge-select status-${newStatus}`; }
+              }
+            });
+
+            ['pending', 'in_progress', 'completed'].forEach(s => {
+              const opt = el('option', { value: s }, s.replace('_', ' ').toUpperCase());
+              if (t.status === s) opt.selected = true;
+              select.appendChild(opt);
+            });
+
+            if (user.role !== 'admin' && t.assigned_to !== user.id) {
+              select.disabled = true;
+            }
+
+            tr.appendChild(el('td', {}, select));
+            tbody.appendChild(tr);
+          });
+          table.appendChild(tbody);
+          pCard.appendChild(table);
+        } else {
+          pCard.appendChild(el('div', {style: 'padding:16px; text-align:center; color:var(--text-light); font-size:14px; background:var(--hover); border-radius:8px;'}, 'No tasks assigned to this project.'));
+        }
+
+        main.appendChild(pCard);
+      });
+
+      // Misc Tasks (if any tasks don't match known projects)
+      const projectIds = new Set(projects.map(p => p.id));
+      const unassignedTasks = tasks.filter(t => !projectIds.has(t.project_id));
+      if (unassignedTasks.length > 0) {
+        const uCard = el('div', { class: 'card' });
+        const uHead = el('div', { class: 'card-header' });
+        uHead.appendChild(el('h2', {}, 'Miscellaneous / Unassigned Tasks'));
+        uCard.appendChild(uHead);
+        
+        const table = el('table');
+        table.appendChild(el('thead', {}, el('tr', {}, el('th', {}, '#'), el('th', {}, 'Task'), el('th', {}, 'Project ID'), el('th', {}, 'Assigned To'), el('th', {}, 'Status'))));
+        const tbody = el('tbody');
+        
+        unassignedTasks.forEach(t => {
+            const assigneeText = t.assignee_name ? `${t.assignee_name}` : `User #${t.assigned_to}`;
+            const tr = el('tr', {},
+              el('td', { style: 'color:var(--text-light)' }, t.id),
+              el('td', { style: 'font-weight:500' }, t.title),
+              el('td', {}, `Proj #${t.project_id}`),
+              el('td', {}, assigneeText)
+            );
+            
+            // Status Badge Dropdown
+            const select = el('select', {
+              class: `badge-select status-${t.status}`,
+              onchange: async (e) => {
+                const newStatus = e.target.value;
+                const pres = await fetch(api + '/tasks/' + t.id + '/status', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                  body: JSON.stringify({ status: newStatus })
+                });
+                if (!pres.ok) { alert('Failed to update status'); e.target.value = t.status; }
+                else { select.className = `badge-select status-${newStatus}`; }
+              }
+            });
+
+            ['pending', 'in_progress', 'completed'].forEach(s => {
+              const opt = el('option', { value: s }, s.replace('_', ' ').toUpperCase());
+              if (t.status === s) opt.selected = true;
+              select.appendChild(opt);
+            });
+
+            if (user.role !== 'admin' && t.assigned_to !== user.id) {
+              select.disabled = true;
+            }
+
+            tr.appendChild(el('td', {}, select));
+            tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        uCard.appendChild(table);
+        main.appendChild(uCard);
+      }
+    }
+
+    // init
+    setAuthArea();
+    renderDashboard();
+  </script>
+</body>
+
+</html>
