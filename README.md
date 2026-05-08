@@ -5,7 +5,7 @@ Team Task Manager is a full-stack web application designed for streamlined proje
 ## 🚀 Key Features
 
 *   **Authentication:** Stateless JWT-based authentication with secure password hashing.
-*   **Role-Based Access Control (RBAC):** Strict separation of privileges between `admin` users (who can create data and manage assignments) and regular `member` users.
+*   **Role-Based Access Control (RBAC):** Strict separation of privileges between `admin` users (who can create/delete data and manage assignments) and regular `member` users.
 *   **Project Workspace Grouping:** Projects act as containers, allowing tasks to be natively grouped under their respective projects for clean visual hierarchy.
 *   **Task Management:** Admins can dynamically assign tasks to users. Users can update their task statuses in real-time.
 *   **Real-time Dashboard:** Aggregated metrics (Total, Completed, Pending, Overdue) generated directly from the database.
@@ -56,5 +56,5 @@ The backend follows strict REST API design principles:
 *   `POST /signup` & `POST /login` (Authentication)
 *   `GET /dashboard` (Metrics Aggregation)
 *   `GET /users` (Team Directory)
-*   `GET /projects` & `POST /projects` (Project Management)
-*   `GET /tasks`, `POST /tasks`, & `PATCH /tasks/{id}/status` (Task Management)
+*   `GET /projects`, `POST /projects`, & `DELETE /projects/{id}` (Project Management)
+*   `GET /tasks`, `POST /tasks`, `PATCH /tasks/{id}/status`, & `DELETE /tasks/{id}` (Task Management)
