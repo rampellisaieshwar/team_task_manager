@@ -481,6 +481,42 @@
       main.appendChild(wrap);
     }
 
+    async function deleteProject(id) {
+      if(!confirm("Are you sure you want to delete this project? All associated tasks will also be affected/deleted.")) return;
+      const token = localStorage.getItem('ttm_token');
+      try {
+        const res = await fetch(api + '/projects/' + id, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if(res.ok) {
+          renderDashboard();
+        } else {
+          alert('Failed to delete project');
+        }
+      } catch(e) {
+        alert('Error deleting project');
+      }
+    }
+
+    async function deleteTask(id) {
+      if(!confirm("Are you sure you want to delete this task?")) return;
+      const token = localStorage.getItem('ttm_token');
+      try {
+        const res = await fetch(api + '/tasks/' + id, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if(res.ok) {
+          renderDashboard();
+        } else {
+          alert('Failed to delete task');
+        }
+      } catch(e) {
+        alert('Error deleting task');
+      }
+    }
+
     async function logout() { localStorage.removeItem('ttm_token'); setAuthArea(); renderDashboard(); }
 
     async function renderDashboard() {
@@ -618,16 +654,32 @@
       projects.forEach(p => {
         const pCard = el('div', { class: 'card' });
         const pHead = el('div', { class: 'card-header' });
-        pHead.appendChild(el('h2', {}, `${p.title} `));
-        pHead.appendChild(el('span', {style: 'font-size:12px; color:var(--text-light); background:var(--hover); padding:4px 8px; border-radius:4px; margin-left:8px; font-weight:normal;'}, `ID: ${p.id}`));
-        pHead.appendChild(el('div', {style: 'font-size:14px; color:var(--text-light); margin-top:4px;'}, p.description));
+        
+        const h2wrap = el('div', {style: 'display:flex; align-items:center; justify-content:space-between;'});
+        const titleArea = el('div');
+        titleArea.appendChild(el('h2', {style: 'display:inline-block; margin:0;'}, `${p.title} `));
+        titleArea.appendChild(el('span', {style: 'font-size:12px; color:var(--text-light); background:var(--hover); padding:4px 8px; border-radius:4px; margin-left:8px; font-weight:normal;'}, `ID: ${p.id}`));
+        h2wrap.appendChild(titleArea);
+        
+        if (user.role === 'admin') {
+           const delBtn = el('button', {
+             onclick: () => deleteProject(p.id),
+             style: 'background:#dc2626; color:white; height:32px; padding:0 12px; font-size:12px;'
+           }, 'Delete Project');
+           h2wrap.appendChild(delBtn);
+        }
+        
+        pHead.appendChild(h2wrap);
+        pHead.appendChild(el('div', {style: 'font-size:14px; color:var(--text-light); margin-top:8px;'}, p.description));
         pCard.appendChild(pHead);
 
         const pTasks = tasks.filter(t => t.project_id === p.id);
         
         if (pTasks.length > 0) {
           const table = el('table');
-          table.appendChild(el('thead', {}, el('tr', {}, el('th', {}, '#'), el('th', {}, 'Task'), el('th', {}, 'Assigned To'), el('th', {}, 'Status'))));
+          const theadTr = el('tr', {}, el('th', {}, '#'), el('th', {}, 'Task'), el('th', {}, 'Assigned To'), el('th', {}, 'Status'));
+          if (user.role === 'admin') theadTr.appendChild(el('th', {}, 'Action'));
+          table.appendChild(el('thead', {}, theadTr));
           const tbody = el('tbody');
           
           pTasks.forEach(t => {
@@ -664,6 +716,15 @@
             }
 
             tr.appendChild(el('td', {}, select));
+            
+            if (user.role === 'admin') {
+               const delBtn = el('button', {
+                 onclick: () => deleteTask(t.id),
+                 style: 'background:#dc2626; color:white; height:28px; padding:0 8px; font-size:12px;'
+               }, 'Delete');
+               tr.appendChild(el('td', {}, delBtn));
+            }
+            
             tbody.appendChild(tr);
           });
           table.appendChild(tbody);
@@ -685,7 +746,9 @@
         uCard.appendChild(uHead);
         
         const table = el('table');
-        table.appendChild(el('thead', {}, el('tr', {}, el('th', {}, '#'), el('th', {}, 'Task'), el('th', {}, 'Project ID'), el('th', {}, 'Assigned To'), el('th', {}, 'Status'))));
+        const theadTr = el('tr', {}, el('th', {}, '#'), el('th', {}, 'Task'), el('th', {}, 'Project ID'), el('th', {}, 'Assigned To'), el('th', {}, 'Status'));
+        if (user.role === 'admin') theadTr.appendChild(el('th', {}, 'Action'));
+        table.appendChild(el('thead', {}, theadTr));
         const tbody = el('tbody');
         
         unassignedTasks.forEach(t => {
@@ -723,6 +786,15 @@
             }
 
             tr.appendChild(el('td', {}, select));
+            
+            if (user.role === 'admin') {
+               const delBtn = el('button', {
+                 onclick: () => deleteTask(t.id),
+                 style: 'background:#dc2626; color:white; height:28px; padding:0 8px; font-size:12px;'
+               }, 'Delete');
+               tr.appendChild(el('td', {}, delBtn));
+            }
+            
             tbody.appendChild(tr);
         });
         table.appendChild(tbody);
